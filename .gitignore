@@ -12,3 +12,4 @@
 *.out
 
 test/bin
+test/cgroup_test
