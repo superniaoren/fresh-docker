@@ -15,8 +15,8 @@ const  cgroupMemoryHierarchyMount = "/sys/fs/cgroup/memory"
 
 func main(){
     if os.Args[0] == "/proc/self/exe" {
-        // the containere process !!
-        fmt.Printf("current pid %d", syscall.Getpid())
+        // the container process !!
+        fmt.Printf("current child pid %d", syscall.Getpid())
         fmt.Println()
 
         cmd := exec.Command("sh", "-c", `stress --vm-bytes 200m --vm-keep -m 1`)
@@ -30,6 +30,8 @@ func main(){
             os.Exit(1)
         }
     }
+    fmt.Printf("current parent pid %d", syscall.Getpid())
+    fmt.Println()
     cmd := exec.Command("/proc/self/exe")
     cmd.SysProcAttr = &syscall.SysProcAttr{
         Cloneflags: syscall.CLONE_NEWUTS | syscall.CLONE_NEWPID | syscall.CLONE_NEWNS,
@@ -41,8 +43,8 @@ func main(){
         fmt.Println("error ", err)
         os.Exit(1)
     } else{
-        // get the forked process's pid
-        fmt.Printf("%v", cmd.Process.Pid)
+        // get the forked process's pid (i.e. child pid)
+        fmt.Printf("cmd.Process.Pid = %v \n", cmd.Process.Pid)
         // create cgroup on the Hierarchy
         os.Mkdir(path.Join(cgroupMemoryHierarchyMount, "testmemlimit"), 0755)
         // add the container process to this cgroup
